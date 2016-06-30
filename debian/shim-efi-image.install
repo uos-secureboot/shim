@@ -1,0 +1,2 @@
+#!/usr/bin/dh-exec
+shim.efi => /boot/efi/EFI/BOOT/bootx64.efi

@@ -1,0 +1,147 @@
+shim (0.9-0) eos; urgency=medium
+
+  * Add new 'shim-efi-image' package to install shim.efi to
+    /boot/efi/EFI/BOOT/bootx64.efi
+  * New upstream release
+
+ -- carlo <carlo@localhost>  Thu, 30 Jun 2016 18:58:31 +0200
+
+shim (0.8-0ubuntu2) wily; urgency=medium
+
+  * No-change rebuild against gnu-efi 3.0v-5ubuntu1.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Tue, 12 May 2015 17:48:30 +0000
+
+shim (0.8-0ubuntu1) wily; urgency=medium
+
+  * New upstream release.
+    - Clarify meaning of insecure_mode. (LP: #1384973)
+  * debian/patches/CVE-2014-3675.patch, debian/patches/CVE-2014-3677.patch,
+    debian/patches/0001-Update-openssl-to-0.9.8za.patch: dropped, included
+    in the upstream release.
+  * debian/patches/sbsigntool-not-pesign,debian/patches/second-stage-path:
+    refreshed.
+
+ -- Mathieu Trudel-Lapierre <mathieu-tl@ubuntu.com>  Mon, 11 May 2015 19:50:49 -0400
+
+shim (0.7-0ubuntu4) utopic; urgency=medium
+
+  * SECURITY UPDATE: heap overflow and out-of-bounds read access when
+    parsing DHCPv6 information
+    - debian/patches/CVE-2014-3675.patch: apply proper bounds checking
+      when parsing data provided in DHCPv6 packets.
+    - CVE-2014-3675
+    - CVE-2014-3676
+  * SECURITY UPDATE: memory corruption when processing user-provided key
+    lists
+    - debian/patches/CVE-2014-3677.patch: detect malformed machine owner
+      key (MOK) lists and ignore them, avoiding possible memory corruption.
+    - CVE-2014-3677
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Wed, 08 Oct 2014 06:40:40 +0000
+
+shim (0.7-0ubuntu2) utopic; urgency=medium
+
+  * Restore debian/patches/prototypes, which still is needed on shim 0.7
+    but only detected on the buildds.
+  * Update debian/patches/prototypes with some new declarations needed for
+    openssl 0.9.8za update.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Tue, 07 Oct 2014 16:20:08 -0700
+
+shim (0.7-0ubuntu1) utopic; urgency=medium
+
+  * New upstream release.
+    - fix spurious error message when fallback.efi is not present, as will
+      always be the case for removable media.  LP: #1297069.
+    - drop most patches, included upstream.
+  * debian/patches/0001-Update-openssl-to-0.9.8za.patch: cherry-pick
+    openssl 0.9.8za in via upstream.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Tue, 07 Oct 2014 05:40:41 +0000
+
+shim (0.4-0ubuntu5) utopic; urgency=low
+
+  * Install fallback.efi.signed as well, to lay the groundwork for fallback
+    handling (wanted when we have to move a drive between machines, or when
+    the firmware loses its marbles^W nvram).
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Mon, 04 Aug 2014 12:11:13 +0200
+
+shim (0.4-0ubuntu4) saucy; urgency=low
+
+  * debian/patches/fix-tftp-prototype: pass the right arguments to
+    EFI_PXE_BASE_CODE_TFTP_READ_FILE.
+  * debian/patches/build-with-Werror: Build with -Werror to catch future
+    prototype mismatches.
+  * debian/patches/fix-compiler-warnings: Fix remaining compiler
+    warnings in netboot.c.
+  * debian/patches/tftp-proper-nul-termination: fix nul termination
+    errors in filenames passed to tftp.
+  * debian/patches/netboot-cleanup: roll-up of miscellaneous fixes to
+    the netboot code.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Mon, 23 Sep 2013 00:30:00 -0700
+
+shim (0.4-0ubuntu3) saucy; urgency=low
+
+  [ Steve Langasek ]
+  * Install MokManager.efi.signed in the package.
+  * debian/patches/no-output-by-default.patch: Don't print any
+    informational messages.  Closes LP: #1074302.
+
+  [ Stéphane Graber ]
+  * debian/patches/no-print-on-unsigned: Don't print an error message when
+    validating an unsigned binary as that tends to hang Lenovo machines.
+    (LP: #1087501)
+
+ -- Stéphane Graber <stgraber@ubuntu.com>  Thu, 08 Aug 2013 17:12:12 +0200
+
+shim (0.4-0ubuntu2) saucy; urgency=low
+
+  * Add missing build-dependency on openssl.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Tue, 02 Jul 2013 20:30:43 +0000
+
+shim (0.4-0ubuntu1) saucy; urgency=low
+
+  * New upstream release.
+  * Drop debian/patches/shim-before-loadimage; upstream has changed this to
+    not call loadimage at all.
+  * debian/patches/sbsigntool-not-pesign: Sign MokManager with
+    sbsigntool instead of pesign.
+  * Add a versioned build-dependency on gnu-efi.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Tue, 02 Jul 2013 12:53:24 -0700
+
+shim (0~20120906.bcd0a4e8-0ubuntu4) quantal-proposed; urgency=low
+
+  * debian/patches/shim-before-loadimage: Use direct verification first
+    before LoadImage.  Addresses an issue where Lenovo's SecureBoot
+    implementation pops an error message on any verification failure - avoid
+    calling LoadImage at all unless we have to.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Wed, 10 Oct 2012 15:28:40 -0700
+
+shim (0~20120906.bcd0a4e8-0ubuntu3) quantal; urgency=low
+
+  * debian/patches/second-stage-path: Chainload grubx64.efi, not
+    grub.efi.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Fri, 05 Oct 2012 11:20:58 -0700
+
+shim (0~20120906.bcd0a4e8-0ubuntu2) quantal; urgency=low
+
+  * debian/patches/prototypes: Include missing prototypes, and disable
+    use of BIO_new_file.
+  * Only build the package for amd64; we're not signing an i386 shim at this
+    stage so there's no point in building it.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Thu, 04 Oct 2012 17:47:04 +0000
+
+shim (0~20120906.bcd0a4e8-0ubuntu1) quantal; urgency=low
+
+  * Initial release.
+  * Include the Canonical Secure Boot master CA.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Thu, 04 Oct 2012 00:01:06 -0700
