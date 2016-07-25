@@ -6,3 +6,4 @@
 override_dh_auto_build:
 	dh_auto_build -- EFI_PATH=/usr/lib
 	cp -v shim.efi bootx64.efi
+	cp -v MokManager.efi.signed MokManager.efi
