@@ -2,3 +2,4 @@ bootx64.efi /boot/efi/EFI/BOOT/
 fallback.efi /boot/efi/EFI/BOOT/
 MokManager.efi  /boot/efi/EFI/endless/
 shim.efi /boot/efi/EFI/endless/
+BOOT.CSV /boot/efi/EFI/endless/

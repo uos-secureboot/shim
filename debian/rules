@@ -8,3 +8,4 @@ override_dh_auto_build:
 	cp -v shim.efi bootx64.efi
 	cp -v MokManager.efi.signed MokManager.efi
 	cp -v fallback.efi.signed fallback.efi
+	iconv -t utf-16le debian/BOOT.CSV.utf8 > BOOT.CSV
