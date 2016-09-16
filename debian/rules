@@ -7,3 +7,4 @@ override_dh_auto_build:
 	dh_auto_build -- EFI_PATH=/usr/lib VENDOR_CERT_FILE=debian/endless-ca.cer
 	cp -v shim.efi bootx64.efi
 	cp -v MokManager.efi.signed MokManager.efi
+	cp -v fallback.efi.signed fallback.efi
