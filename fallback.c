@@ -176,9 +176,11 @@ add_boot_option(EFI_DEVICE_PATH *hddp, EFI_DEVICE_PATH *fulldp,
 			cursor += DevicePathSize(hddp);
 			StrCpy((CHAR16 *)cursor, arguments);
 
+#ifdef DEBUG_FALLBACK
 			Print(L"Creating boot entry \"%s\" with label \"%s\" "
 					L"for file \"%s\"\n",
 				varname, label, filename);
+#endif
 
 			if (!first_new_option) {
 				first_new_option = DuplicateDevicePath(fulldp);
@@ -839,7 +841,9 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
 		return rc;
 	}
 
+#ifdef DEBUG_FALLBACK
 	Print(L"System BootOrder not found.  Initializing defaults.\n");
+#endif
 
 	set_boot_order();
 
@@ -851,7 +855,9 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
 
 	try_start_first_option(image);
 
+#ifdef DEBUG_FALLBACK
 	Print(L"Reset System\n");
+#endif
 	uefi_call_wrapper(RT->ResetSystem, 4, EfiResetCold,
 			  EFI_SUCCESS, 0, NULL);
 
