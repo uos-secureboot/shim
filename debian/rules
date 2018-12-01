@@ -17,7 +17,13 @@ endif
 
 override_dh_auto_build:
 	dh_auto_build -- EFI_PATH=/usr/lib VENDOR_CERT_FILE=$(cert)
+	cp -v shimx64.efi bootx64.efi
+	cp -v mm.efi.signed MokManager.efi
+	cp -v fb.efi.signed fallback.efi
+	iconv -t utf-16le debian/BOOT.CSV.utf8 > BOOT.CSV
 
 override_dh_fixperms:
 	dh_fixperms
 	chmod a-x debian/shim/usr/lib/shim/shimx64.efi
+	chmod a-x debian/shim/boot/efi/EFI/BOOT/bootx64.efi
+	chmod a-x debian/shim/boot/efi/EFI/BOOT/MokManager.efi
