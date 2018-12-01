@@ -16,7 +16,7 @@ endif
 	dh $@ --parallel
 
 override_dh_auto_build:
-	dh_auto_build -- EFI_PATH=/usr/lib VENDOR_CERT_FILE=$(cert)
+	dh_auto_build -- EFI_PATH=/usr/lib VENDOR_CERT_FILE=$(cert) ENABLE_SBSIGN=1
 	cp -v shimx64.efi bootx64.efi
 	cp -v mm.efi.signed MokManager.efi
 	cp -v fb.efi.signed fallback.efi
