@@ -4,7 +4,9 @@
 # dpkg-vendor --derives-from, because only Canonical-generated binaries will
 # be signed with this key; so if you are building your own shim binary you
 # should be building the other binaries also.
-ifeq ($(shell dpkg-vendor --is ubuntu && echo yes),yes)
+ifeq ($(shell dpkg-vendor --is endless && echo yes),yes)
+	cert=debian/endless-uefi-ca.der
+else ifeq ($(shell dpkg-vendor --is ubuntu && echo yes),yes)
 	cert=debian/canonical-uefi-ca.der
 else
 	cert=debian/debian-uefi-ca.der
