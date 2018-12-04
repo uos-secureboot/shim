@@ -225,7 +225,6 @@ clean-shim-objs:
 	@rm -rvf $(TARGET) *.o $(SHIM_OBJS) $(MOK_OBJS) $(FALLBACK_OBJS) $(KEYS) certdb $(BOOTCSVNAME)
 	@rm -vf *.debug *.so *.efi *.efi.* *.tar.* version.c buildid
 	@rm -vf Cryptlib/*.[oa] Cryptlib/*/*.[oa]
-	@git clean -f -d -e 'Cryptlib/OpenSSL/*'
 
 clean: clean-shim-objs
 	$(MAKE) -C Cryptlib -f $(TOPDIR)/Cryptlib/Makefile clean
