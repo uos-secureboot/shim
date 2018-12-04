@@ -5,8 +5,16 @@
 # be signed with this key; so if you are building your own shim binary you
 # should be building the other binaries also.
 ifeq ($(shell dpkg-vendor --is ubuntu && echo yes),yes)
+	oslabel="Ubuntu"
+	efidir=ubuntu
 	cert=debian/canonical-uefi-ca.der
+else ifeq ($(shell dpkg-vendor --is endless && echo yes),yes)
+	oslabel="Endless OS"
+	efidir=endless
+	cert=debian/endless-uefi-ca.der
 else
+	oslabel="Debian"
+	efidir=debian
 	cert=debian/debian-uefi-ca.der
 endif
 
@@ -15,6 +23,9 @@ endif
 
 override_dh_auto_build:
 	dh_auto_build -- EFI_PATH=/usr/lib VENDOR_CERT_FILE=$(cert)
+
+override_dh_auto_install:
+	dh_auto_install -- EFIDIR=$(efidir) OSLABEL=$(oslabel)
 
 override_dh_fixperms:
 	dh_fixperms
