@@ -7,6 +7,11 @@
 ifeq ($(shell dpkg-vendor --is ubuntu && echo yes),yes)
 	cert=debian/canonical-uefi-ca.der
 	distributor=ubuntu
+else ifeq ($(shell dpkg-vendor --is endless && echo yes),yes)
+	cert=debian/endless-uefi-ca.der
+	distributor=endless
+	oslabel="Endless OS"
+COMMON_OPTIONS ?= OSLABEL=$(oslabel)
 else
 	cert=debian/debian-uefi-ca.der
 	distributor=debian
