@@ -20,6 +20,9 @@ EFI_LOADED_IMAGE *this_image = NULL;
 int
 get_fallback_verbose(void)
 {
+#ifdef FALLBACK_VERBOSE
+	return 1;
+#else
 	UINT8 *data = NULL;
 	UINTN dataSize = 0;
 	EFI_STATUS efi_status;
@@ -47,6 +50,7 @@ get_fallback_verbose(void)
 	if (data)
 		FreePool(data);
 	return state;
+#endif
 }
 
 #define VerbosePrintUnprefixed(fmt, ...)				\
