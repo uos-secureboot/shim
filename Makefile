@@ -50,6 +50,10 @@ SOURCES = $(foreach source,$(ORIG_SOURCES),$(TOPDIR)/$(source)) version.c
 MOK_SOURCES = $(foreach source,$(ORIG_MOK_SOURCES),$(TOPDIR)/$(source))
 FALLBACK_SRCS = $(foreach source,$(ORIG_FALLBACK_SRCS),$(TOPDIR)/$(source))
 
+ifneq ($(origin FALLBACK_VERBOSE), undefined)
+	CFLAGS += -DFALLBACK_VERBOSE
+endif
+
 all: $(TARGETS)
 
 shim.crt:
