@@ -1037,21 +1037,20 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
 	}
 
 	efi_status = fallback_should_prefer_reset();
-	if (EFI_ERROR(efi_status)) {
+	if (EFI_ERROR(efi_status))
 		VerbosePrint(L"tpm not present, starting the first image\n");
-		try_start_first_option(image);
-	} else {
+	else
 		VerbosePrint(L"tpm present, resetting system\n");
-	}
-
-	console_print(L"Reset System\n");
 
 	if (get_fallback_verbose()) {
 		console_print(L"Verbose enabled, sleeping for half a second\n");
 		msleep(500000);
 	}
 
-	gRT->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
+	if (EFI_ERROR(efi_status))
+		try_start_first_option(image);
+	else
+		gRT->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
 
 	return EFI_SUCCESS;
 }
