@@ -1043,8 +1043,14 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
 		VerbosePrint(L"tpm present, resetting system\n");
 
 	if (get_fallback_verbose()) {
-		console_print(L"Verbose enabled, sleeping for half a second\n");
-		msleep(500000);
+		int fallback_verbose_wait = 500000; /* default to 0.5s */
+#ifdef FALLBACK_VERBOSE_WAIT
+		fallback_verbose_wait = FALLBACK_VERBOSE_WAIT;
+#endif
+		console_print(L"Verbose enabled, sleeping for %d mseconds... "
+			      L"Press the Pause key now to hold for longer.\n",
+			      fallback_verbose_wait);
+		msleep(fallback_verbose_wait);
 	}
 
 	if (EFI_ERROR(efi_status))
