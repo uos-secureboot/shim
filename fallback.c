@@ -315,87 +315,6 @@ calc_masked_boot_option_size(unsigned int size)
 	       sizeof(ami_masked_device_path_guid) + sizeof(EFI_DEVICE_PATH);
 }
 
-static int
-check_masked_boot_option(CHAR8 *candidate, unsigned int candidate_size,
-			 CHAR8 *data, unsigned int data_size)
-{
-	/*
-	 * The patched BootXXXX variables contain a hardware device path and
-	 * an end path, preceding the real device path.
-	 */
-	if (calc_masked_boot_option_size(data_size) != candidate_size)
-		return 1;
-
-	CHAR8 *cursor = candidate;
-
-	/* Check whether the BootXXXX is patched */
-	cursor += sizeof(UINT32) + sizeof(UINT16);
-	cursor += StrSize((CHAR16 *)cursor);
-
-	unsigned int min_valid_size = cursor - candidate + sizeof(EFI_DEVICE_PATH);
-
-	if (candidate_size <= min_valid_size)
-		return 1;
-
-	EFI_DEVICE_PATH *dp = (EFI_DEVICE_PATH *)cursor;
-	unsigned int node_size = DevicePathNodeLength(dp) - sizeof(EFI_DEVICE_PATH);
-
-	min_valid_size += node_size;
-	if (candidate_size <= min_valid_size ||
-	    DevicePathType(dp) != HARDWARE_DEVICE_PATH ||
-	    DevicePathSubType(dp) != HW_VENDOR_DP ||
-	    node_size != sizeof(ami_masked_device_path_guid) ||
-	    CompareGuid((EFI_GUID *)(cursor + sizeof(EFI_DEVICE_PATH)),
-		        &ami_masked_device_path_guid))
-		return 1;
-
-	/* Check whether the patched guid is followed by an end path */
-	min_valid_size += sizeof(EFI_DEVICE_PATH);
-	if (candidate_size <= min_valid_size)
-		return 1;
-
-	dp = NextDevicePathNode(dp);
-	if (!IsDevicePathEnd(dp))
-		return 1;
-
-	/*
-	 * OK. We may really get a masked BootXXXX variable. The next
-	 * step is to test whether it is hidden.
-	 */
-	UINT32 attrs = *(UINT32 *)candidate;
-#ifndef LOAD_OPTION_HIDDEN
-#  define LOAD_OPTION_HIDDEN	0x00000008
-#endif
-        if (!(attrs & LOAD_OPTION_HIDDEN))
-		return 1;
-
-	attrs &= ~LOAD_OPTION_HIDDEN;
-
-	/* Compare the field Attributes */
-	if (attrs != *(UINT32 *)data)
-		return 1;
-
-	/* Compare the field FilePathListLength */
-	data += sizeof(UINT32);
-	candidate += sizeof(UINT32);
-	if (calc_masked_boot_option_size(*(UINT16 *)data) !=
-					 *(UINT16 *)candidate)
-		return 1;
-
-	/* Compare the field Description */
-	data += sizeof(UINT16);
-	candidate += sizeof(UINT16);
-	if (CompareMem(candidate, data, cursor - candidate))
-		return 1;
-
-	/* Compare the filed FilePathList */
-	cursor = (CHAR8 *)NextDevicePathNode(dp);
-	data += sizeof(UINT16);
-	data += StrSize((CHAR16 *)data);
-
-	return CompareMem(cursor, data, candidate_size - min_valid_size);
-}
-
 EFI_STATUS
 find_boot_option(EFI_DEVICE_PATH *dp, EFI_DEVICE_PATH *fulldp,
                  CHAR16 *filename, CHAR16 *label, CHAR16 *arguments,
@@ -450,11 +369,10 @@ find_boot_option(EFI_DEVICE_PATH *dp, EFI_DEVICE_PATH *fulldp,
 		if (EFI_ERROR(efi_status))
 			continue;
 
-		if (candidate_size != size) {
-			if (check_masked_boot_option(candidate, candidate_size,
-						     data, size))
-				continue;
-		} else if (CompareMem(candidate, data, size))
+		if (candidate_size != size)
+			continue;
+
+		if (CompareMem(candidate, data, size))
 			continue;
 
 		VerbosePrint(L"Found boot entry \"%s\" with label \"%s\" "
