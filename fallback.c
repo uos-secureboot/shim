@@ -321,23 +321,9 @@ find_boot_option(EFI_DEVICE_PATH *dp, EFI_DEVICE_PATH *fulldp,
                  UINT16 *optnum)
 {
 	unsigned int label_size = StrLen(label)*2 + 2;
-	unsigned int size = sizeof(UINT32) + sizeof (UINT16) +
-		label_size + DevicePathSize(dp) +
+	unsigned int header_size = sizeof(UINT32) + sizeof (UINT16);
+	unsigned int size = header_size + label_size + DevicePathSize(dp) +
 		StrLen(arguments) * 2;
-
-	CHAR8 *data = AllocateZeroPool(size + 2);
-	if (!data)
-		return EFI_OUT_OF_RESOURCES;
-	CHAR8 *cursor = data;
-	*(UINT32 *)cursor = LOAD_OPTION_ACTIVE;
-	cursor += sizeof (UINT32);
-	*(UINT16 *)cursor = DevicePathSize(dp);
-	cursor += sizeof (UINT16);
-	StrCpy((CHAR16 *)cursor, label);
-	cursor += label_size;
-	CopyMem(cursor, dp, DevicePathSize(dp));
-	cursor += DevicePathSize(dp);
-	StrCpy((CHAR16 *)cursor, arguments);
 
 	CHAR16 varname[256];
 	EFI_STATUS efi_status;
@@ -345,10 +331,8 @@ find_boot_option(EFI_DEVICE_PATH *dp, EFI_DEVICE_PATH *fulldp,
 
 	UINTN max_candidate_size = calc_masked_boot_option_size(size);
 	CHAR8 *candidate = AllocateZeroPool(max_candidate_size);
-	if (!candidate) {
-		FreePool(data);
+	if (!candidate)
 		return EFI_OUT_OF_RESOURCES;
-	}
 
 	varname[0] = 0;
 	while (1) {
@@ -369,29 +353,41 @@ find_boot_option(EFI_DEVICE_PATH *dp, EFI_DEVICE_PATH *fulldp,
 		if (EFI_ERROR(efi_status))
 			continue;
 
-		if (candidate_size != size)
+		/* Check that we won't overrun the buffer when comparing */
+		if (candidate_size < header_size + label_size)
 			continue;
 
-		if (CompareMem(candidate, data, size))
+		/* Check if the label matches the one we are looking for */
+		CHAR8 *cursor = candidate + header_size;
+		VerbosePrint(L"%s: \"%s\"\n", varname, cursor);
+
+		if (CompareMem(cursor, label, label_size))
 			continue;
 
-		VerbosePrint(L"Found boot entry \"%s\" with label \"%s\" "
-			     L"for file \"%s\"\n", varname, label, filename);
+		VerbosePrint(L"Found existing boot entry \"%s\" for label "
+			     L"\"%s\", removing\n", varname, label);
 
-		/* at this point, we have duplicate data. */
-		if (!first_new_option) {
-			first_new_option = DuplicateDevicePath(fulldp);
-			first_new_option_args = arguments;
-			first_new_option_size = StrLen(arguments) * sizeof (CHAR16);
+		/* at this point, we have a duplicate label -- remove it */
+		efi_status = LibDeleteVariable(varname, &GV_GUID);
+		if (!EFI_ERROR(efi_status)) {
+			int i, newnbootorder = 0;
+			int bootnum = xtoi(varname + 4);
+
+			CHAR16 *newbootorder = NULL;
+			newbootorder = AllocateZeroPool(sizeof (CHAR16) * nbootorder);
+			if (!newbootorder)
+				return EFI_OUT_OF_RESOURCES;
+
+			for (i = 0; i < nbootorder; i++)
+				if (bootorder[i] != bootnum)
+					newbootorder[newnbootorder++] = bootorder[i];
+
+			FreePool(bootorder);
+			bootorder = newbootorder;
+			nbootorder = newnbootorder;
 		}
-
-		*optnum = xtoi(varname + 4);
-		FreePool(candidate);
-		FreePool(data);
-		return EFI_SUCCESS;
 	}
 	FreePool(candidate);
-	FreePool(data);
 	return EFI_NOT_FOUND;
 }
 
