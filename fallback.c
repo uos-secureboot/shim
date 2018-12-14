@@ -965,12 +965,6 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
 		return efi_status;
 	}
 
-	efi_status = fallback_should_prefer_reset();
-	if (EFI_ERROR(efi_status))
-		VerbosePrint(L"tpm not present, starting the first image\n");
-	else
-		VerbosePrint(L"tpm present, resetting system\n");
-
 	if (get_fallback_verbose()) {
 		int fallback_verbose_wait = 500000; /* default to 0.5s */
 #ifdef FALLBACK_VERBOSE_WAIT
@@ -982,10 +976,8 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
 		msleep(fallback_verbose_wait);
 	}
 
-	if (EFI_ERROR(efi_status))
-		try_start_first_option(image);
-	else
-		gRT->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
+	try_start_first_option(image);
+	gRT->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
 
 	return EFI_SUCCESS;
 }
