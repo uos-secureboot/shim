@@ -353,6 +353,19 @@ find_boot_option(EFI_DEVICE_PATH *dp, EFI_DEVICE_PATH *fulldp,
 				buffer_size = varname_size;
 				continue;
 			}
+
+			if (efi_status == EFI_DEVICE_ERROR)
+				VerbosePrint(L"The next variable name could "
+					     L"not be retrieved due to a "
+					     L"hardware error\n");
+
+			if (efi_status == EFI_INVALID_PARAMETER)
+				VerbosePrint(L"Invalid parameter to "
+					     L"GetNextVariableName: "
+					     L"varname_size=%d, varname=%s\n",
+					     varname_size, varname);
+
+			/* EFI_NOT_FOUND means we listed all variables */
 			break;
 		}
 
