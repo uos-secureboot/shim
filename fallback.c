@@ -327,7 +327,9 @@ find_boot_option(EFI_DEVICE_PATH *dp, EFI_DEVICE_PATH *fulldp,
 
 	EFI_STATUS efi_status;
 	EFI_GUID vendor_guid = NullGuid;
+	UINTN rmlist_len = 0;
 	UINTN buffer_size = 256 * sizeof(CHAR16);
+	CHAR16 **rmlist = NULL;
 	CHAR16 *varname = AllocateZeroPool(buffer_size);
 	if (!varname)
 		return EFI_OUT_OF_RESOURCES;
@@ -392,13 +394,24 @@ find_boot_option(EFI_DEVICE_PATH *dp, EFI_DEVICE_PATH *fulldp,
 			continue;
 
 		VerbosePrint(L"Found existing boot entry \"%s\" for label "
-			     L"\"%s\", removing\n", varname, label);
+			     L"\"%s\", adding to remove list\n", varname,
+			     label);
 
-		/* at this point, we have a duplicate label -- remove it */
-		efi_status = LibDeleteVariable(varname, &GV_GUID);
-		if (!EFI_ERROR(efi_status)) {
+		/* we have a duplicate label -- add to rmlist */
+		rmlist = ReallocatePool(rmlist, rmlist_len * sizeof(CHAR16 *),
+					(rmlist_len+1) * sizeof(CHAR16 *));
+		rmlist[rmlist_len] = AllocateZeroPool(varname_size);
+		CopyMem(rmlist[rmlist_len], varname, varname_size);
+		rmlist_len++;
+	}
+
+	/* remove all variables from rmlist */
+	while (rmlist_len) {
+		rmlist_len--;
+		VerbosePrint(L"Removing \"%s\"\n", rmlist[rmlist_len]);
+		if (!EFI_ERROR(LibDeleteVariable(rmlist[rmlist_len], &GV_GUID))) {
 			int i, newnbootorder = 0;
-			int bootnum = xtoi(varname + 4);
+			int bootnum = xtoi(rmlist[rmlist_len] + 4);
 
 			CHAR16 *newbootorder = NULL;
 			newbootorder = AllocateZeroPool(sizeof (CHAR16) * nbootorder);
@@ -413,7 +426,9 @@ find_boot_option(EFI_DEVICE_PATH *dp, EFI_DEVICE_PATH *fulldp,
 			bootorder = newbootorder;
 			nbootorder = newnbootorder;
 		}
+		FreePool(rmlist[rmlist_len]);
 	}
+
 	FreePool(candidate);
 	FreePool(varname);
 	return efi_status;
