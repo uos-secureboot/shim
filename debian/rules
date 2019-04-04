@@ -22,10 +22,10 @@ endif
 	dh $@ --parallel
 
 override_dh_auto_build:
-	dh_auto_build -- EFI_PATH=/usr/lib VENDOR_CERT_FILE=$(cert) ENABLE_SHIM_CERT=1 ENABLE_SBSIGN=1 FALLBACK_VERBOSE_WAIT=3000000
+	dh_auto_build -- EFI_PATH=/usr/lib VENDOR_CERT_FILE=$(cert) FALLBACK_VERBOSE_WAIT=3000000
 
 override_dh_auto_install:
-	dh_auto_install -- EFIDIR=$(efidir) OSLABEL=$(oslabel) ENABLE_SHIM_CERT=1 ENABLE_SBSIGN=1
+	dh_auto_install -- EFIDIR=$(efidir) OSLABEL=$(oslabel)
 
 override_dh_fixperms:
 	dh_fixperms
