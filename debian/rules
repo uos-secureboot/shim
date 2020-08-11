@@ -8,21 +8,30 @@ ifeq ($(shell dpkg-vendor --is ubuntu && echo yes),yes)
 	oslabel="Ubuntu"
 	efidir=ubuntu
 	cert=debian/canonical-uefi-ca.der
+	dbx=
 else ifeq ($(shell dpkg-vendor --is endless && echo yes),yes)
 	oslabel="Endless OS"
 	efidir=endless
 	cert=debian/endless-uefi-ca.der
+	dbx=debian/endless-uefi-dbx.esl
 else
 	oslabel="Debian"
 	efidir=debian
 	cert=debian/debian-uefi-ca.der
+	dbx=
+endif
+
+ifneq ($(dbx),)
+	DBX_OPTIONS = VENDOR_DBX_FILE=$(dbx)
+else
+	DBX_OPTIONS =
 endif
 
 %:
 	dh $@ --parallel
 
 override_dh_auto_build:
-	dh_auto_build -- EFI_PATH=/usr/lib VENDOR_CERT_FILE=$(cert) FALLBACK_VERBOSE_WAIT=3000000
+	dh_auto_build -- EFI_PATH=/usr/lib VENDOR_CERT_FILE=$(cert) $(DBX_OPTIONS) FALLBACK_VERBOSE_WAIT=3000000
 
 override_dh_auto_install:
 	dh_auto_install -- EFIDIR=$(efidir) OSLABEL=$(oslabel)
