@@ -9,9 +9,10 @@ ifeq ($(shell dpkg-vendor --is ubuntu && echo yes),yes)
 	distributor=ubuntu
 else ifeq ($(shell dpkg-vendor --is endless && echo yes),yes)
 	cert=debian/endless-uefi-ca.der
+	dbx=debian/endless-uefi-dbx.esl
 	distributor=endless
 	oslabel="Endless OS"
-COMMON_OPTIONS ?= OSLABEL=$(oslabel) FALLBACK_VERBOSE_WAIT=3000000
+COMMON_OPTIONS ?= VENDOR_DBX_FILE=$(dbx) OSLABEL=$(oslabel) FALLBACK_VERBOSE_WAIT=3000000
 else
 	cert=debian/debian-uefi-ca.der
 	distributor=debian
