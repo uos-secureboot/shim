@@ -1,3 +1,112 @@
+shim (15+1552672080.a4a1fbe-0ubuntu2) focal; urgency=medium
+
+  * d/patches/fix-path-checks.patch: Cherry-pick upstream fix for regression
+    in loading fwupd, or anything else specified as an argument (LP: #1864223)
+
+ -- Julian Andres Klode <juliank@ubuntu.com>  Fri, 20 Mar 2020 16:19:14 +0100
+
+shim (15+1552672080.a4a1fbe-0ubuntu1) eoan; urgency=medium
+
+  * New upstream snapshot 15+1552672080.a4a1fbe.
+  * debian/patches/VLogError-Avoid-NULL-pointer-dereferences-in-V-Sprin.patch,
+    debian/patches/fixup_git.patch: drop patches included in upstream.
+  * debian/patches/MokManager-avoid-unaligned.patch: Fix compilation with GCC9:
+    avoid -Werror=address-of-packed-member errors in MokManager.
+  * debian/patches/tpm-correctness-1.patch,
+    debian/patches/tpm-correctness-2.patch: fix issues in TPM calls to ensure
+    the measurements are consistent with what is entered in the TPM event log.
+  * debian/patches/tpm-correctness-3.patch: Don't log duplicate identical
+    TPM events.
+  * debian/patches/MokManager-hidpi-support.patch: Do a little bit more to
+    try to get a more usable screen resolution for MokManager when running on
+    HiDPI screens; by trying to detect such cases and switching to mode 0.
+  * debian/rules: update COMMIT_ID explicitly for this new snapshot.
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Fri, 11 Oct 2019 16:32:32 -0400
+
+shim (15+1533136590.3beb971-0ubuntu2) eoan; urgency=medium
+
+  * debian/copyright: Update upstream source location.
+  * d/p/VLogError-Avoid-NULL-pointer-dereferences-in-V-Sprin.patch: Fix
+    NULL pointer dereferences that lead to an exception error on arm64.
+    (LP: #1811722)
+  * d/p/Fix-OBJ_create-to-tolerate-a-NULL-sn-and-ln.patch: Fix NULL
+    pointer dereference when calling OBJ_create() that leads to an
+    exception error on arm64. (LP: #1811901)
+  * debian/rules: Fix syntax of else statement when setting EFI_ARCH.
+
+ -- dann frazier <dannf@ubuntu.com>  Tue, 30 Apr 2019 12:45:02 -0600
+
+shim (15+1533136590.3beb971-0ubuntu1) cosmic; urgency=medium
+
+  [ Steve Langasek ]
+  * Fix Vcs link.
+
+  [ dann frazier ]
+  * Enable arm64 build.
+
+  [ Mathieu Trudel-Lapierre ]
+  * New upstream snapshot.
+  * debian/patches/abort_abort_abort.patch: dropped patch, included upstream.
+  * debian/rules:
+    - define RELEASE and COMMIT_ID for the snapshot.
+    - Set ENABLE_HTTPBOOT to enable the HTTP Boot feature.
+  * debian/patches/fixup_git.patch: don't run git in clean; we're not really
+    in a git tree.
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Wed, 22 Aug 2018 10:52:10 -0400
+
+shim (13-0ubuntu2) bionic; urgency=medium
+
+  * debian/patches/abort_abort_abort.patch: signtool.exe isn't happy with some
+    of the structure of our binary, partly because abort() is thought to be an
+    external symbol, which causes some relocalisations to appear.
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Tue, 07 Nov 2017 10:19:04 -0500
+
+shim (13-0ubuntu1) artful; urgency=medium
+
+  * New upstream release: 13
+  * debian/control: add a Build-Depends on libelf-dev.
+  * debian/control: add Breaks: for the previous shim-signed builds given
+    that shim will now build and ship BOOT.CSV by itself.
+  * debian/rules:
+    - Update dh_auto_build/dh_auto_clean/dh_auto_install for new upstream
+      options: set MAKELEVEL.
+    - Define an EFI_ARCH variable, and use that for paths to shim. This
+      makes it possible to build a shim for other architectures than amd64.
+    - Set EFIDIR=ubuntu for dh_auto_install; that will let files be installed
+      in the "right" final directories, and makes boot.csv for us.
+    - Set ENABLE_SHIM_CERT, to keep using ephemeral self-signed certs built
+      at compile-time for MokManager and fallback.
+    - Set ENABLE_SBSIGN, to use sbsign instead of pesign for signing fallback
+      and MokManager.
+  * debian/patches/second-stage-path: dropped; the default loader path now
+    includes an arch suffix.
+  * debian/patches/sbsigntool-no-pesign: dropped; no longer needed..
+  * debian/patches/0001-shim-fix-the-mirroring-MokSBState-fail.patch: dropped,
+    included upstream.
+  * debian/shim.install: update paths in light of using shim's upstream install
+    target.
+  * debian/rules, debian/shim.install: make sure the 'make install' step does
+    what it's meant to do by upstream: we can easily make use of the end result
+    to have the files we need.
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Fri, 29 Sep 2017 15:11:28 -0400
+
+shim (0.9+1474479173.6c180c6-1ubuntu1) zesty; urgency=medium
+
+  [ Steve Langasek ]
+  * Merge (not yet NEW cleared) changes from Debian branch.
+
+  [ Mathieu Trudel-Lapierre ]
+  * debian/patches/0001-shim-fix-the-mirroring-MokSBState-fail.patch: guard
+    against errors in mirroring MokSBState to MokSBStateRT. Thanks to Ivan Hu
+    for the patch. This will fix issues updating MokSBStateRT if the variable
+    already exists with different attributes. (LP: #1644806)
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Thu, 01 Dec 2016 16:55:50 -0500
+
 shim (0.9+1474479173.6c180c6-1) unstable; urgency=medium
 
   [ Steve Langasek ]
@@ -19,13 +128,13 @@ shim (0.9+1474479173.6c180c6-1) unstable; urgency=medium
 
  -- Julien Cristau <jcristau@debian.org>  Sat, 15 Oct 2016 15:17:34 +0200
 
-shim (0.9+1474479173.6c180c6-0ubuntu1) UNRELEASED; urgency=medium
+shim (0.9+1474479173.6c180c6-0ubuntu1) yakkety; urgency=medium
 
   [ Helen Koike ]
   * debian/copyright: add OpenSSL license 
 
   [ Mathieu Trudel-Lapierre ]
-  * New upstream release.
+  * New upstream release. (LP: #1624096)
   * debian/copyright: patches should be BSD, like the rest of the upstream
     code.
   * debian/patches/unused-variable: dropped; applied upstream.
@@ -34,7 +143,7 @@ shim (0.9+1474479173.6c180c6-0ubuntu1) UNRELEASED; urgency=medium
     file to properly pick up shim (shim$arch), MokManager (mm$arch), and
     fallback (fb$arch).
 
- -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Wed, 21 Sep 2016 20:29:44 -0400
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Thu, 22 Sep 2016 15:02:20 -0400
 
 shim (0.9+1465500757.14a5905-0ubuntu1) yakkety; urgency=medium
 
