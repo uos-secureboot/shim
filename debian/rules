@@ -30,7 +30,6 @@ COMMON_OPTIONS = \
 	MAKELEVEL=0 \
 	EFI_PATH=/usr/lib \
 	ENABLE_HTTPBOOT=true \
-	ENABLE_SHIM_CERT=1 \
 	ENABLE_SBSIGN=1 \
 	VENDOR_CERT_FILE=$(cert) \
 	EFIDIR=$(distributor) \
