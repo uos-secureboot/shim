@@ -7,11 +7,6 @@
 ifeq ($(shell dpkg-vendor --is ubuntu && echo yes),yes)
 	cert=debian/canonical-uefi-ca.der
 	distributor=ubuntu
-else ifeq ($(shell dpkg-vendor --is deepin && echo yes),yes)
-	cert=debian/deepin-uefi-ca.der
-	distributor=deepin
-	oslabel="deepin"
-COMMON_OPTIONS ?= VENDOR_DBX_FILE=$(dbx) OSLABEL=$(oslabel) FALLBACK_VERBOSE_WAIT=3000000
 else ifeq ($(shell dpkg-vendor --is uos && echo yes),yes)
 	cert=debian/UOS-UEFI-RSA.der
 	distributor=uos
