@@ -8,7 +8,7 @@ ifeq ($(shell dpkg-vendor --is ubuntu && echo yes),yes)
 	cert=debian/canonical-uefi-ca.der
 	distributor=ubuntu
 else ifeq ($(shell dpkg-vendor --is uos && echo yes),yes)
-	cert=debian/UOS-UEFI-RSA.der
+	cert=debian/uos-uefi-ca.der
 	distributor=uos
 	oslabel="uos"
 COMMON_OPTIONS ?= VENDOR_DBX_FILE=$(dbx) OSLABEL=$(oslabel) FALLBACK_VERBOSE_WAIT=3000000
